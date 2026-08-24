@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Methods Hub v2.9</title>
+<style>
+:root{
+  --bg:#0b1020;
+  --card:#151a2b;
+  --card-hover:#1b2033;
+  --border:#343b52;
+  --text:#f4f6fa;
+  --muted:#9eabba;
+  --green:#9b88ff;
+  --green-dim:#292341;
+  --purple:#9b88ff;
+  --purple-dark:#292341;
+  --cyan:#65d9d0;
+  --red:#ff7885;
+  --input:#0c1118;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+button,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{width:min(1120px,calc(100% - 44px));margin:0 auto;padding:28px 0 70px}
+.header{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+.title{font-size:42px;font-weight:950;letter-spacing:-.055em;line-height:1}
+.version{
+  font-size:10px;font-weight:900;color:#9b88ff;
+  border:1px solid #4a4270;background:#211d38;
+  padding:5px 8px;border-radius:999px;
+  letter-spacing:.04em;
+}
+.hidden{display:none!important}
+
+/* HOME — intentionally simple, like Gym Hub */
+
+.home-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  align-items:start;
+}
+.home-session-wrap{min-width:0}
+.home-card{
+  width:100%;
+  min-height:190px;
+  padding:0;
+  border:1px solid #343b52;
+  border-radius:18px;
+  background:linear-gradient(145deg,#171b2c,#121624);
+  color:var(--text);
+  overflow:hidden;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.home-card:hover{
+  border-color:#575077;
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(0,0,0,.20);
+}
+.session-open{
+  appearance:none;
+  width:100%;
+  min-height:144px;
+  padding:22px 20px 12px;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+}
+.session-open:hover{background:rgba(155,136,255,.035)}
+.home-label{
+  color:#a696ff;
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:.1em;
+  margin-bottom:9px;
+}
+.home-name{
+  color:#f4f6fb;
+  font-size:30px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-.04em;
+}
+.home-sub{
+  color:#9faabd;
+  font-size:14px;
+  margin-top:9px;
+}
+.delete-session{
+  margin:0 20px 17px;
+  padding:7px 10px;
+  border:1px solid #633b49;
+  border-radius:9px;
+  background:#24171e;
+  color:#ff9aa9;
+  font-size:12px;
+  font-weight:850;
+}
+.delete-session:hover{
+  background:#2c1a23;
+  border-color:#814b5b;
+}
+.add-session-card{
+  padding:22px 20px;
+  min-height:190px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+}
+.add-session-card:hover{cursor:pointer}
+.add-plus{
+  color:#a696ff;
+  font-size:38px;
+  line-height:1;
+  margin-bottom:12px;
+}
+@media(max-width:720px){
+  .home-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:720px){
+ .app{width:min(100% - 24px,1120px);padding-top:20px}
+  .title{font-size:32px}
+  .home-grid{grid-template-columns:1fr}
+}
+
+/* SESSION */
+.back{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:14px;
+}
+.btn{
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:#171d25;
+  color:var(--text);
+  padding:9px 13px;
+  font-size:13px;
+  font-weight:850;
+}
+.btn:hover{border-color:#4b5665;background:#1b222b}
+.btn.primary{
+  background:linear-gradient(135deg,#8e77ff,#7259e9);
+  border-color:#917cff;
+  color:white;
+}
+.btn.green{
+  background:#172a19;
+  border-color:#3a683b;
+  color:#9cff8a;
+}
+.btn.danger{
+  background:#27161a;
+  border-color:#62343b;
+  color:#ff9ba5;
+}
+.btn.small{font-size:12px;padding:7px 10px}
+
+.session-top{
+  background:linear-gradient(145deg,#151a2b 0%,#111624 100%);
+  border:1px solid #343b52;
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
+.timer-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  margin:0 0 16px;
+}
+.timer-kicker{
+  color:#a696ff;
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:.10em;
+  margin-bottom:5px;
+}
+.timer-header .session-title{
+  color:#f4f6fa;
+  font-size:26px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-.045em;
+  margin:0 0 4px;
+}
+.session-date{
+  color:#91a0b6;
+  font-size:12px;
+}
+.study-time{
+  color:#f4f6fa;
+  font-size:40px;
+  line-height:.95;
+  font-weight:950;
+  letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+}
+.timer-stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:8px;
+}
+.timer-stat{
+  min-width:0;
+  background:#0e1420;
+  border:1px solid #30384b;
+  border-radius:11px;
+  padding:10px 11px;
+}
+.timer-stat-label{
+  color:#8996aa;
+  font-size:9px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.07em;
+  margin-bottom:4px;
+}
+.timer-stat-value{
+  color:#edf0f6;
+  font-size:18px;
+  line-height:1;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+}
+.timer-controls{
+  display:grid;
+  grid-template-columns:1.5fr 1fr .72fr .82fr;
+  gap:7px;
+}
+.timer-controls button{
+  min-height:39px;
+  padding:8px 12px;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:950;
+  transition:transform .12s ease,background .12s ease,border-color .12s ease;
+}
+.timer-controls button:active{transform:translateY(1px)}
+.timer-main-btn{
+  color:#e4ddff;
+  background:#292344;
+  border:1px solid #574c85;
+}
+.timer-main-btn:hover{background:#332b51}
+.timer-secondary-btn{
+  color:#cbd5e5;
+  background:#151e2e;
+  border:1px solid #39465c;
+}
+.timer-secondary-btn:hover{background:#1b2638}
+.timer-reset-btn{
+  color:#aeb9ca;
+  background:#101721;
+  border:1px solid #303c4e;
+}
+.timer-reset-btn:hover{background:#151e2b}
+.timer-finish-btn{
+  color:#ff9aa8;
+  background:#291a22;
+  border:1px solid #633d49;
+}
+.timer-finish-btn:hover{background:#351e28}
+.rest{
+  display:none;
+  margin-top:9px;
+  padding:10px 12px;
+  border-radius:11px;
+  border:1px solid #4c4470;
+  background:#17182a;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.rest.show{display:flex}
+.rest-kicker{
+  color:#a696ff;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.09em;
+}
+.rest-note{
+  color:#8794a8;
+  font-size:10px;
+  margin-top:3px;
+}
+.rest-time{
+  color:#f0edff;
+  font-size:20px;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+}
+.countdown{
+  margin-top:13px;
+  padding-top:11px;
+  border-top:1px solid #2d3547;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.countdown-label{
+  color:#8d9aae;
+  font-size:11px;
+}
+.countdown-time{
+  color:#f2f4f8;
+  font-size:16px;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+}
+
+@media(max-width:720px){
+  .timer-header{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:9px;
+  }
+  .study-time{font-size:36px}
+  .timer-stats{grid-template-columns:1fr}
+  .timer-controls{grid-template-columns:1fr 1fr}
+}
+
+/* PRACTICE */
+.practice{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+}
+.practice-head{
+  padding:19px 20px 15px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+}
+.practice-head h2{margin:0;font-size:22px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px 0}
+select{
+  color:#e9edf5;
+  background:#111720;
+  border:1px solid #394351;
+  border-radius:10px;
+  padding:9px 11px;
+  outline:none;
+}
+select:focus{border-color:var(--purple)}
+option{background:#111720;color:#fff}
+.question{padding:0 20px 24px}
+.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.pill{
+  border:1px solid #354052;
+  background:#1b222d;
+  color:#aeb9c9;
+  border-radius:999px;
+  padding:5px 9px;
+  font-size:10px;
+  font-weight:850;
+}
+.question-text{
+  font-size:20px;
+  line-height:1.55;
+  font-weight:750;
+  margin:15px 0;
+}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+details{
+  border-top:1px solid #303946;
+}
+summary{
+  list-style:none;
+  cursor:pointer;
+  padding:15px 0;
+  font-size:14px;
+  font-weight:900;
+}
+summary::-webkit-details-marker{display:none}
+summary:before{
+  content:"▸";
+  display:inline-block;
+  width:21px;
+  color:#98a4b6;
+}
+details[open] summary:before{content:"▾"}
+.help-body{
+  padding:0 4px 17px 21px;
+  color:#d2d9e4;
+  font-size:13px;
+  line-height:1.75;
+}
+.method strong{color:#fff}
+code{
+  background:#26213e;
+  color:#dcd5ff;
+  border-radius:5px;
+  padding:2px 5px;
+}
+.result{
+  display:none;
+  margin-top:13px;
+  padding:14px;
+  background:#121c2a;
+  border:1px solid #39516a;
+  border-left:4px solid var(--cyan);
+  border-radius:12px;
+  color:#dce4ee;
+  font-size:13px;
+  line-height:1.65;
+}
+.result.show{display:block}
+.result strong{color:#fff}
+.result ol{margin:7px 0 5px 20px;padding:0}
+
+/* EXAM */
+.exam{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+}
+.exam-top{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:center;
+}
+.exam-clock{
+  font-size:31px;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+}
+.exam-question{
+  border-top:1px solid var(--border);
+  margin-top:16px;
+  padding-top:16px;
+}
+.exam-question h3{font-size:15px;margin:0 0 8px}
+.exam-question p{color:#e2e7ef;line-height:1.65}
+@media(max-width:720px){
+ .session-top-row,.exam-top{flex-direction:column}
+ .timer-area{text-align:left}
+ .timer-buttons{justify-content:flex-start}
+ .countdown{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:720px){
+  .timer-header{align-items:flex-start;flex-direction:column}
+  .study-time{font-size:36px}
+  .timer-stats{grid-template-columns:1fr}
+  .timer-controls{grid-template-columns:1fr 1fr}
+}
+
+
+.mark-correct{
+  color:#b9f5c2;
+  background:#13251a;
+  border:1px solid #315e3c;
+}
+.mark-wrong{
+  color:#ffabb6;
+  background:#291a21;
+  border:1px solid #633d49;
+}
+.mark-good{color:#9ee7ab}
+.mark-bad{color:#ff9aa8}
+
+.math-block{margin:12px 0;padding:8px 4px;overflow-x:auto;text-align:center;color:#f2f4f8}
+.solution-steps{display:flex;flex-direction:column;gap:2px}
+.solution-step{padding:2px 0;overflow-x:auto}
+
+.mark-options{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:12px 0 3px;
+  flex-wrap:wrap;
+}
+.mark-label{
+  color:#9aa6b9;
+  font-size:11px;
+  font-weight:800;
+  margin-right:2px;
+}
+.mark-options button{
+  border-radius:9px;
+  padding:7px 12px;
+  font-size:11px;
+  font-weight:950;
+  cursor:pointer;
+}
+.mark-correct-top{
+  color:#b9f5c2;
+  background:#13251a;
+  border:1px solid #315e3c;
+}
+.mark-correct-top:hover{background:#183020}
+.mark-wrong-top{
+  color:#ffabb6;
+  background:#291a21;
+  border:1px solid #633d49;
+}
+.mark-wrong-top:hover{background:#351e28}
+.mark-result{
+  display:none;
+  margin-top:9px;
+  padding:8px 11px;
+  border-left:3px solid #8d7cff;
+  border-radius:7px;
+  background:#101722;
+  color:#aeb9ca;
+  font-size:11px;
+}
+.mark-result.show{display:block}
+.mark-result strong{font-size:12px}
+.mark-result span{color:#8e9bad}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <header class="header">
+    <div class="title">Math Methods Hub</div>
+    <div class="version">v2.9</div>
+  </header>
+
+  <!-- HOME -->
+<main id="home">
+  <div class="home-grid" id="homeGrid">
+    <div class="home-session-wrap" data-session="1">
+      <div class="home-card">
+        <button class="session-open" onclick="openSession(1)">
+          <div class="home-label">STUDY SESSION</div>
+          <div class="home-name">Session 1</div>
+          <div class="home-sub">Start a study session →</div>
+        </button>
+        
+      </div>
+    </div>
+
+    <button type="button" class="home-card add-session-card" onclick="addSession()">
+      <div class="add-plus">+</div>
+      <div class="home-name">Add Session</div>
+      <div class="home-sub">New study session</div>
+    </button>
+  </div>
+</main>
+
+<!-- SESSION -->
+  <main id="session" class="hidden">
+    <button class="btn small back" onclick="goHome()">← Home</button>
+
+    <section class="session-top">
+  <div class="timer-header">
+    <div>
+      <div class="timer-kicker">SESSION TIMER</div>
+      <div id="sessionTitle" class="session-title">Session 1</div>
+      <div id="sessionDate" class="session-date"></div>
+    </div>
+    <div id="studyClock" class="study-time">00:00</div>
+  </div>
+
+  <div class="timer-stats">
+    <div class="timer-stat"><div class="timer-stat-label">TOTAL STUDY</div><div id="studyStat" class="timer-stat-value">00:00</div></div>
+    <div class="timer-stat"><div class="timer-stat-label">TOTAL REST</div><div id="restStat" class="timer-stat-value">00:00</div></div>
+    <div class="timer-stat"><div class="timer-stat-label">ACTIVE TIME</div><div id="activeStat" class="timer-stat-value">00:00</div></div>
+  </div>
+
+  <div class="timer-controls">
+    <button id="startPauseButton" class="timer-main-btn" onclick="toggleStudy()">▶ Start Study</button>
+    <button id="restButton" class="timer-secondary-btn" onclick="toggleRest()">☕ Start Rest</button>
+    <button class="timer-reset-btn" onclick="resetSessionTimer()">Reset</button>
+    <button class="timer-finish-btn" onclick="finishSession()">Finish</button>
+  </div>
+
+  <div id="restPanel" class="rest">
+    <div><div class="rest-kicker">REST IN PROGRESS</div><div class="rest-note">Total rest keeps accumulating.</div></div>
+    <div id="restClock" class="rest-time">00:00</div>
+  </div>
+
+  <div class="countdown">
+    <div class="countdown-label">Exam countdown</div>
+    <div id="examCountdown" class="countdown-time">Exam date not set</div>
+  </div>
+</section>
+
+<section class="practice">
+      <div class="practice-head">
+        <h2>Practice Questions</h2>
+        <button class="btn primary" onclick="requestNewQuestion()">New Question</button>
+      </div>
+
+      <div class="filters">
+        <select id="difficulty" onchange="requestNewQuestion()">
+          <option>All difficulties</option>
+          <option>Simple Familiar</option>
+          <option>Complex Familiar</option>
+          <option>Simple Unfamiliar</option>
+          <option>Complex Unfamiliar</option>
+        </select>
+        <select id="topic" onchange="requestNewQuestion()">
+          <option>All topics</option>
+          <option>Surds & Algebra</option>
+          <option>Quadratics</option>
+          <option>Functions</option>
+          <option>Probability</option>
+          <option>Exponential & Logarithmic Functions</option>
+          <option>Trigonometry</option>
+          <option>Differentiation</option>
+          <option>Applications of Differentiation</option>
+          <option>Rates of Change</option>
+        </select>
+      </div>
+
+      <div id="questionArea"></div>
+    </section>
+  </main>
+
+  <!-- PRACTICE EXAM -->
+  <main id="exam" class="hidden">
+    <button class="btn small back" onclick="goHome()">← Home</button>
+    <section class="exam">
+      <div class="exam-top">
+        <div>
+          <div class="kicker">PRACTICE EXAM</div>
+          <h2 style="margin:5px 0 2px">Mathematical Methods Practice Exam</h2>
+          <div style="color:var(--muted);font-size:13px">Exam-style questions and representations</div>
+        </div>
+        <div id="examClock" class="exam-clock">90:00</div>
+      </div>
+      <div class="actions" style="margin-top:15px">
+        <button class="btn primary" onclick="startExam()">Start Exam</button>
+        <button class="btn danger" onclick="finishExam()">Finish Exam</button>
+      </div>
+      <div id="examArea"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+/*
+  Math Methods Hub v2.9
+  Rebuilt from scratch around the user's established design:
+  - Gym Hub-style home
+  - sessions on home
+  - study stopwatch + rest stopwatch
+  - practice questions inside sessions
+  - four QCAA-style difficulty labels
+  - question-specific marking guides
+  - expandable Hint / Teach Me / Full Worked Solution
+  - professional mathematical typesetting
+*/
+
+const questions=[
+{id:1,topic:"Surds & Algebra",difficulty:"Simple Familiar",marks:2,
+q:"Simplify \\(\\sqrt{147}\\). Give your answer in simplest surd form.",
+method:null,hint:"Find the largest perfect-square factor of \\(147\\), then split the square root.",
+teach:"Rewrite \\(147\\) as \\(49\\times3\\). Use \\(\\sqrt{ab}=\\sqrt a\\sqrt b\\). Since \\(\\sqrt{49}=7\\), the simplified surd is \\(7\\sqrt3\\).",
+solution:`<div class="solution-steps"><div class="solution-step">\\[\\sqrt{147}=\\sqrt{49\\times3}\\]</div><div class="solution-step">\\[=\\sqrt{49}\\sqrt3\\]</div><div class="solution-step">\\[=\\boxed{7\\sqrt3}\\]</div></div>`,
+rubric:["Write 147 as 49×3.","Split the square root into √49×√3.","Evaluate √49 as 7.","State 7√3 in simplest surd form."],
+allocation:"1 mark for the correct factorisation; 1 mark for the simplified surd."},
+
+{id:2,topic:"Quadratics",difficulty:"Complex Familiar",marks:4,
+q:"Factorise \\(2x^2+7x+3\\).",
+method:"AC Method",hint:"Identify \\(A=2\\), \\(B=7\\), \\(C=3\\). Calculate \\(A\\times C\\) first.",
+teach:"The AC Method is used when the coefficient of \\(x^2\\) is not \\(1\\). Find two numbers that MULTIPLY to \\(A\\times C\\) and ADD (+) to \\(B\\). Here \\(2\\times3=6\\), and \\(6\\times1=6\\) while \\(6+1=7\\). Split \\(7x\\) into \\(6x+x\\), then factorise by grouping.",
+solution:`<div class="solution-steps"><div class="solution-step">\\[2x^2+7x+3\\]</div><div class="solution-step">\\[=2x^2+6x+x+3\\]</div><div class="solution-step">\\[=2x(x+3)+1(x+3)\\]</div><div class="solution-step">\\[=\\boxed{(2x+1)(x+3)}\\]</div></div>`,
+rubric:["Identify A=2, B=7, C=3.","Calculate A×C=6.","Find 6 and 1 because 6×1=6 and 6+1=7.","Split 7x into 6x+x.","Factorise by grouping.","Give (2x+1)(x+3)."],
+allocation:"1 mark A×C; 1 mark correct split; 1 mark grouping; 1 mark final factorisation."},
+
+{id:3,topic:"Probability",difficulty:"Simple Familiar",marks:2,
+q:"An event \\(A\\) has probability \\(P(A)=0.72\\). Find the probability that \\(A\\) does not occur.",
+method:"Complement Rule",hint:"“Does not occur” means you need the complement.",
+teach:"The Complement Rule means the event that does NOT happen. The rule is \\(P(A')=1-P(A)\\). In simple terms: NOT \\(A\\) = \\(1-A\\).",
+solution:`<div class="solution-steps"><div class="solution-step">\\[P(A')=1-P(A)\\]</div><div class="solution-step">\\[=1-0.72\\]</div><div class="solution-step">\\[=\\boxed{0.28}\\]</div></div>`,
+rubric:["Recognise that 'does not occur' means complement.","Use P(A′)=1−P(A).","Substitute 0.72.","Calculate 0.28."],
+allocation:"1 mark for the correct rule; 1 mark for the correct probability."},
+
+{id:4,topic:"Differentiation",difficulty:"Complex Familiar",marks:4,
+q:"Differentiate \\(y=(3x-2)^4\\).",
+method:"Chain Rule",hint:"Differentiate the outside power, keep the inside unchanged, then multiply by the derivative of the inside.",
+teach:"Use the Chain Rule. In simple terms: OUTSIDE derivative × INSIDE derivative. If \\(y=[g(x)]^n\\), then \\(\\frac{dy}{dx}=n[g(x)]^{n-1}g'(x)\\).",
+solution:`<div class="solution-steps"><div class="solution-step">\\[y=(3x-2)^4\\]</div><div class="solution-step">\\[\\frac{dy}{dx}=4(3x-2)^3\\times3\\]</div><div class="solution-step">\\[\\boxed{\\frac{dy}{dx}=12(3x-2)^3}\\]</div></div>`,
+rubric:["Recognise the composite function.","Differentiate the outside to 4(3x−2)^3.","Differentiate the inside to 3.","Multiply the derivatives.","Simplify to 12(3x−2)^3."],
+allocation:"1 mark chain-rule structure; 1 outside derivative; 1 inside derivative; 1 final expression."},
+
+{id:5,topic:"Functions",difficulty:"Simple Unfamiliar",marks:3,
+q:"A function is defined by \\(f(x)=2x-5\\). Find \\(f(4)\\) and state what the result represents.",
+method:null,hint:"\\(f(4)\\) means substitute \\(4\\) wherever \\(x\\) appears.",
+teach:"The notation \\(f(4)\\) means the output when the input is \\(4\\). Substitute \\(x=4\\), then calculate.",
+solution:`<div class="solution-steps"><div class="solution-step">\\[f(4)=2(4)-5\\]</div><div class="solution-step">\\[=8-5\\]</div><div class="solution-step">\\[\\boxed{f(4)=3}\\]</div><div class="solution-step">Input \\(4\\) produces output \\(3\\).</div></div>`,
+rubric:["Interpret f(4) as substitution.","Calculate 2(4)−5.","Obtain 3.","State that input 4 gives output 3."],
+allocation:"1 mark substitution; 1 mark calculation; 1 mark interpretation."},
+
+{id:6,topic:"Rates of Change",difficulty:"Complex Unfamiliar",marks:5,
+q:"The height of an object is \\(h(t)=-2t^2+12t+1\\) metres. Find the instantaneous rate of change of height at \\(t=2\\), and interpret your answer.",
+method:null,hint:"Differentiate \\(h(t)\\), then substitute \\(t=2\\). The derivative gives the instantaneous rate of change.",
+teach:"Differentiate term-by-term. The derivative tells you how quickly height is changing at that exact time. A positive value means the height is increasing; a negative value means it is decreasing.",
+solution:`<div class="solution-steps"><div class="solution-step">\\[h(t)=-2t^2+12t+1\\]</div><div class="solution-step">\\[h'(t)=-4t+12\\]</div><div class="solution-step">\\[h'(2)=-4(2)+12\\]</div><div class="solution-step">\\[=4\\]</div><div class="solution-step">Therefore, the height is increasing at \\(4\\text{ m/s}\\) when \\(t=2\\).</div></div>`,
+rubric:["Differentiate to h′(t)=−4t+12.","Substitute t=2.","Calculate h′(2)=4.","Interpret the derivative as instantaneous rate.","State the direction and units."],
+allocation:"1 mark differentiation; 1 substitution; 1 calculation; 1 interpretation; 1 units/direction."}
+];
+
+let current=null;
+let used=new Set();
+
+function filteredQuestions(){
+  const d=document.getElementById("difficulty").value;
+  const t=document.getElementById("topic").value;
+  let pool=questions.filter(q=>
+    (d==="All difficulties"||q.difficulty===d)&&
+    (t==="All topics"||q.topic===t)&&
+    !used.has(q.id)
+  );
+  if(!pool.length){
+    used.clear();
+    pool=questions.filter(q=>
+      (d==="All difficulties"||q.difficulty===d)&&
+      (t==="All topics"||q.topic===t)
+    );
+  }
+  return pool;
+}
+
+function requestNewQuestion(){
+  if(!confirm("Move to a new question? Your current question will be replaced."))return;
+  newQuestion();
+}
+
+function newQuestion(){
+  const pool=filteredQuestions();
+  if(!pool.length)return;
+  current=pool[Math.floor(Math.random()*pool.length)];
+  used.add(current.id);
+  renderQuestion();
+}
+
+function teachVisual(q){
+  if(q.method==="AC Method"){
+    return `
+      <div class="teach-visual">
+        <div class="teach-row"><div class="teach-math">\\(2x^2+7x+3\\)</div><div class="teach-note">Identify \(A=2,\ B=7,\ C=3\).</div></div>
+        <div class="teach-row"><div class="teach-math">\\(A\\times C=2\\times3=6\\)</div><div class="teach-note"><b>AC:</b> multiply \(A\times C\).</div></div>
+        <div class="teach-row"><div class="teach-math">\\(6\\times1=6\\)<br>\\(6+1=7\\)</div><div class="teach-note">Find two numbers that multiply to \(6\) and add to \(7\).</div></div>
+        <div class="teach-row"><div class="teach-math">\\(2x^2+6x+x+3\\)</div><div class="teach-note">Split \(7x\) into \(6x+x\).</div></div>
+        <div class="teach-row"><div class="teach-math">\\(2x(x+3)+1(x+3)\\)</div><div class="teach-note">Group terms and factor the common bracket.</div></div>
+        <div class="teach-row teach-final"><div class="teach-math">\\(\\boxed{(2x+1)(x+3)}\\)</div><div class="teach-note"><b>Answer.</b> The quadratic is factorised.</div></div>
+      </div>`;
+  }
+
+  if(q.method==="Complement Rule"){
+    return `
+      <div class="teach-visual">
+        <div class="teach-row"><div class="teach-math">\\(P(A)=0.72\\)</div><div class="teach-note">This is the probability of \(A\).</div></div>
+        <div class="teach-row"><div class="teach-math">\\(P(A')=1-P(A)\\)</div><div class="teach-note"><b>Complement:</b> “not \(A\)” means \(1-\) the probability of \(A\).</div></div>
+        <div class="teach-row"><div class="teach-math">\\(=1-0.72=0.28\\)</div><div class="teach-note">Substitute and calculate.</div></div>
+        <div class="teach-row teach-final"><div class="teach-math">\\(\\boxed{0.28}\\)</div><div class="teach-note"><b>Answer.</b></div></div>
+      </div>`;
+  }
+
+  if(q.method==="Chain Rule"){
+    return `
+      <div class="teach-visual">
+        <div class="teach-row"><div class="teach-math">\\(y=(2x+1)^3\\)</div><div class="teach-note">There is an outside power and an inside function.</div></div>
+        <div class="teach-row"><div class="teach-math">\\(3(2x+1)^2\\)</div><div class="teach-note">Differentiate the outside.</div></div>
+        <div class="teach-row"><div class="teach-math">\\(\\times\\frac{d}{dx}(2x+1)=2\\)</div><div class="teach-note">Then multiply by the derivative of the inside.</div></div>
+        <div class="teach-row teach-final"><div class="teach-math">\\(\\boxed{6(2x+1)^2}\\)</div><div class="teach-note"><b>Answer.</b></div></div>
+      </div>`;
+  }
+
+  if(q.topic==="Surds & Algebra"){
+    return `
+      <div class="teach-visual">
+        <div class="teach-row"><div class="teach-math">\\(\\sqrt{147}=\\sqrt{49\\times3}\\)</div><div class="teach-note">Take out the largest perfect square.</div></div>
+        <div class="teach-row"><div class="teach-math">\\(=\\sqrt{49}\\sqrt3\\)</div><div class="teach-note">Split the square root.</div></div>
+        <div class="teach-row teach-final"><div class="teach-math">\\(\\boxed{7\\sqrt3}\\)</div><div class="teach-note">Because \(\sqrt{49}=7\).</div></div>
+      </div>`;
+  }
+
+  return `
+    <div class="teach-visual">
+      <div class="teach-row">
+        <div class="teach-math">\\(\\text{Question}\\)</div>
+        <div class="teach-note">Start by identifying the rule or method needed.</div>
+      </div>
+      <div class="teach-row teach-final">
+        <div class="teach-math">\\(\\boxed{\\text{Answer}}\\)</div>
+        <div class="teach-note">Work through the steps, then check your answer.</div>
+      </div>
+    </div>`;
+}
+
+function renderQuestion(){
+  const q=current;
+  document.getElementById("questionArea").innerHTML=`
+    <div class="question">
+      <div class="meta">
+        <span class="pill">${q.topic}</span>
+        <span class="pill">${q.difficulty}</span>
+        <span class="pill">${q.marks} estimated marks</span>
+      </div>
+
+      <div class="question-text">${q.q}</div>
+
+      <div class="actions">
+        <div class="mark-options">
+      <span class="mark-label">Mark question:</span>
+      <button class="mark-correct-top" onclick="recordMark(true)">✓ Correct</button>
+      <button class="mark-wrong-top" onclick="recordMark(false)">✗ Wrong</button>
+    </div>
+      </div>
+
+      <details>
+        <summary>💡 Hint</summary>
+        <div class="help-body">${q.hint}</div>
+      </details>
+
+      <details>
+        <summary>🧠 Teach Me</summary>
+        <div class="help-body">
+          ${teachVisual(q)}
+        </div>
+      </details>
+
+      <details>
+        <summary>✓ Full Worked Solution</summary>
+        <div class="help-body">${q.solution}</div>
+      </details>
+
+      <div id="markResult" class="result"></div>
+    </div>`;
+  if(window.MathJax) MathJax.typesetPromise([document.getElementById("questionArea")]);
+}
+
+function recordMark(correct){
+  const result=document.getElementById("markResult");
+  result.innerHTML = correct
+    ? `<strong class="mark-good">✓ Correct</strong><br><span>Good work. Move on when you're ready.</span>`
+    : `<strong class="mark-bad">✗ Wrong</strong><br><span>Use the Hint, Teach Me, or Full Worked Solution to find where you went wrong before moving on.</span>`;
+  result.classList.add("show");
+}
+
+/* SESSION TIMER */
+
+
+/* SESSION TIMER */
+let studySeconds=0, studyRunning=false, studyStartedAt=0, studyBase=0, studyInterval=null;
+let restSeconds=0, restRunning=false, restStartedAt=0, restBase=0, restInterval=null;
+
+function studyNow(){return studyRunning?studyBase+Math.floor((Date.now()-studyStartedAt)/1000):studySeconds}
+function restNow(){return restRunning?restBase+Math.floor((Date.now()-restStartedAt)/1000):restSeconds}
+function formatShortTime(s){
+  s=Math.max(0,Math.floor(s)); const h=Math.floor(s/3600);
+  return h>0?h+":"+String(Math.floor((s%3600)/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"):String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
+function updateTimers(){
+  studySeconds=studyNow(); restSeconds=restNow();
+  document.getElementById("studyClock").textContent=formatShortTime(studySeconds);
+  document.getElementById("studyStat").textContent=formatShortTime(studySeconds);
+  document.getElementById("restStat").textContent=formatShortTime(restSeconds);
+  document.getElementById("activeStat").textContent=formatShortTime(studySeconds);
+  document.getElementById("restClock").textContent=formatShortTime(restSeconds);
+  document.getElementById("startPauseButton").textContent=studyRunning?"Ⅱ Pause Study":"▶ Start Study";
+  document.getElementById("restButton").textContent=restRunning?"■ End Rest":"☕ Start Rest";
+}
+function startStudy(){
+  studySeconds=studyNow(); studyBase=studySeconds; studyStartedAt=Date.now(); studyRunning=true;
+  clearInterval(studyInterval); studyInterval=setInterval(updateTimers,200); updateTimers();
+}
+function pauseStudy(){studySeconds=studyNow();studyBase=studySeconds;studyRunning=false;updateTimers()}
+function toggleStudy(){if(restRunning)endRest();if(studyRunning)pauseStudy();else startStudy()}
+function toggleRest(){
+  if(restRunning){endRest();return}
+  studySeconds=studyNow();studyBase=studySeconds;studyRunning=false;
+  restSeconds=restNow();restBase=restSeconds;restStartedAt=Date.now();restRunning=true;
+  document.getElementById("restPanel").classList.add("show");
+  clearInterval(restInterval);restInterval=setInterval(updateTimers,200);updateTimers();
+}
+function endRest(){
+  restSeconds=restNow();restBase=restSeconds;restRunning=false;restStartedAt=0;
+  document.getElementById("restPanel").classList.remove("show");
+  clearInterval(restInterval);restInterval=null;startStudy();
+}
+function resetSessionTimer(){
+  if(!confirm("Reset this session timer? Your study and rest times will return to 00:00."))return;
+  studySeconds=0;studyRunning=false;studyStartedAt=0;studyBase=0;
+  restSeconds=0;restRunning=false;restStartedAt=0;restBase=0;
+  clearInterval(studyInterval);clearInterval(restInterval);studyInterval=null;restInterval=null;
+  document.getElementById("restPanel").classList.remove("show");updateTimers();
+}
+let nextSessionNumber = 2;
+
+function addSession(){
+  const grid=document.getElementById("homeGrid");
+  if(!grid)return;
+
+  const number=nextSessionNumber++;
+  const wrap=document.createElement("div");
+  wrap.className="home-session-wrap";
+  wrap.dataset.session=number;
+
+  wrap.innerHTML=`
+    <div class="home-card">
+      <button class="session-open" type="button" onclick="openSession(${number})">
+        <div class="home-label">STUDY SESSION</div>
+        <div class="home-name">Session ${number}</div>
+        <div class="home-sub">Start a study session →</div>
+      </button>
+      <button class="delete-session" type="button" onclick="deleteSession(${number},event)">Delete Session</button>
+    </div>
+  `;
+
+  const addCard=grid.querySelector(".add-session-card");
+  grid.insertBefore(wrap,addCard);
+}
+
+function deleteSession(number,event){
+  if(event)event.stopPropagation();
+  if(number===1)return;
+
+  const confirmed=confirm(
+    `Delete Session ${number}? This cannot be undone.`
+  );
+  if(!confirmed)return;
+
+  const card=document.querySelector(
+    `.home-session-wrap[data-session="${number}"]`
+  );
+  if(card)card.remove();
+}
+
+function openSession(number){
+  if(!confirm("Start Session "+number+"?"))return;
+  const now=new Date(),days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  document.getElementById("home").classList.add("hidden");document.getElementById("exam").classList.add("hidden");document.getElementById("session").classList.remove("hidden");
+  document.getElementById("sessionTitle").textContent="Session "+number;
+  document.getElementById("sessionDate").textContent=`Started ${days[now.getDay()]} • ${now.toLocaleDateString("en-AU",{day:"2-digit",month:"long",year:"numeric"})}`;
+  studySeconds=0;studyRunning=false;studyStartedAt=0;studyBase=0;
+  restSeconds=0;restRunning=false;restStartedAt=0;restBase=0;
+  clearInterval(studyInterval);clearInterval(restInterval);studyInterval=null;restInterval=null;
+  document.getElementById("restPanel").classList.remove("show");updateTimers();newQuestion();
+}
+function finishSession(){
+  if(!confirm("Finish this study session?"))return;
+  studySeconds=studyNow();restSeconds=restNow();studyRunning=false;restRunning=false;
+  clearInterval(studyInterval);clearInterval(restInterval);studyInterval=null;restInterval=null;goHome();
+}
+function goHome(){
+  document.getElementById("session").classList.add("hidden");document.getElementById("exam").classList.add("hidden");document.getElementById("home").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* EXAM — ready for the verified exam date/time to be inserted */
+let examRunning=false;
+let examSeconds=5400;
+let examInterval=null;
+
+function startExam(){
+  if(!confirm("Start the 90-minute Practice Exam?"))return;
+  examRunning=true;
+  examSeconds=5400;
+  clearInterval(examInterval);
+  examInterval=setInterval(()=>{
+    examSeconds--;
+    if(examSeconds<=0){
+      examSeconds=0;
+      examRunning=false;
+      clearInterval(examInterval);
+      alert("Practice exam time is finished.");
+    }
+    document.getElementById("examClock").textContent=
+      Math.floor(examSeconds/60)+":"+String(examSeconds%60).padStart(2,"0");
+  },1000);
+}
+
+function finishExam(){
+  if(!examRunning)return;
+  if(!confirm("Finish the Practice Exam?"))return;
+  examRunning=false;
+  clearInterval(examInterval);
+}
+
+function renderExam(){
+  const examQs=[questions[1],questions[2],questions[5]];
+  document.getElementById("examArea").innerHTML=examQs.map((q,i)=>`
+    <div class="exam-question">
+      <h3>Question ${i+1} • ${q.marks} marks</h3>
+      <p>${q.q}</p>
+    </div>`).join("");
+  if(window.MathJax) MathJax.typesetPromise([document.getElementById("examArea")]);
+}
+
+function openExam(){
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("session").classList.add("hidden");
+  document.getElementById("exam").classList.remove("hidden");
+  renderExam();
+}
+
+document.getElementById("examCountdown").textContent="Exam date not set";
+</script>
+</body>
+</html>
